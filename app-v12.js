@@ -142,6 +142,8 @@
     sCurveForecastFinish: $("#sCurveForecastFinish"),
     sCurveRequiredDaily: $("#sCurveRequiredDaily"),
     sCurveHistoricalDaily: $("#sCurveHistoricalDaily"),
+    sCurveProductivityIndex: $("#sCurveProductivityIndex"),
+    sCurveScheduleHealth: $("#sCurveScheduleHealth"),
     sCurveMatchedPoints: $("#sCurveMatchedPoints"),
     sCurveNote: $("#sCurveNote")
   };
@@ -2350,9 +2352,6 @@
     els.sCurveTargetProgress.textContent = result.hasPlanned
       ? `${format2(result.targetProgressPercent)}%`
       : "-";
-    els.sCurveVariance.textContent = result.hasPlanned
-      ? `${result.variancePercent > 0 ? "+" : ""}${format2(result.variancePercent)}%`
-      : "-";
     els.sCurveForecastFinish.textContent = result.forecastFinishKey
       ? prettyFullDate(result.forecastFinishKey)
       : "-";
@@ -2362,8 +2361,10 @@
     els.sCurveHistoricalDaily.textContent = result.recentDailyProductivity
       ? `${format2(result.recentDailyProductivity)} ${result.productivityUnit}/day`
       : "-";
-    els.sCurveMatchedPoints.textContent =
-      `${formatInt(result.matchedPoints)} / ${formatInt(result.totalPoints)}`;
+    els.sCurveProductivityIndex.textContent = result.productivityIndex
+      ? format2(result.productivityIndex)
+      : "-";
+    els.sCurveScheduleHealth.textContent = result.scheduleHealth || "-";
 
     if (state.charts.progressSCurve) {
       state.charts.progressSCurve.destroy();
@@ -2471,11 +2472,11 @@
     els.sCurveCompletedScope.textContent = "0";
     els.sCurveProgress.textContent = "0.00%";
     els.sCurveTargetProgress.textContent = "-";
-    els.sCurveVariance.textContent = "-";
     els.sCurveForecastFinish.textContent = "-";
     els.sCurveRequiredDaily.textContent = "-";
     els.sCurveHistoricalDaily.textContent = "-";
-    els.sCurveMatchedPoints.textContent = "0 / 0";
+    els.sCurveProductivityIndex.textContent = "-";
+    els.sCurveScheduleHealth.textContent = "-";
     els.sCurveNote.textContent = message;
 
     if (state.charts.progressSCurve) {
@@ -2632,16 +2633,32 @@
       .sort()
       .at(-1) || "";
     const remainingScope = Math.max(0, totalScope - completedScope);
-    const remainingDays = plannedFinishKey
-      ? Math.max(1, daysBetween(asOfKey, plannedFinishKey))
+    const remainingWorkingDays = plannedFinishKey
+      ? workingDaysBetween(asOfKey, plannedFinishKey)
       : 0;
-    const requiredDailyProductivity = remainingScope && remainingDays
-      ? round(remainingScope / remainingDays)
+    const requiredDailyProductivity = remainingScope && remainingWorkingDays > 0
+      ? round(remainingScope / remainingWorkingDays)
       : 0;
 
     const forecastFinishKey = recentDailyProductivity && remainingScope
-      ? addDaysKey(asOfKey, Math.ceil(remainingScope / recentDailyProductivity))
+      ? addWorkingDaysKey(asOfKey, Math.ceil(remainingScope / recentDailyProductivity))
       : (remainingScope ? "" : asOfKey);
+
+    const productivityIndex = requiredDailyProductivity && recentDailyProductivity
+      ? round(recentDailyProductivity / requiredDailyProductivity)
+      : 0;
+
+    let scheduleHealth = "-";
+    if (plannedFinishKey && forecastFinishKey) {
+      const delayDays = workingDaysBetween(plannedFinishKey, forecastFinishKey);
+      if (remainingScope <= 0 || delayDays <= 0) {
+        scheduleHealth = "🟢 On Track";
+      } else if (delayDays <= 5) {
+        scheduleHealth = "🟡 At Risk";
+      } else {
+        scheduleHealth = "🔴 Delayed";
+      }
+    }
 
     return {
       dateKeys,
@@ -2658,6 +2675,8 @@
       requiredDailyProductivity,
       historicalDailyProductivity,
       recentDailyProductivity,
+      productivityIndex,
+      scheduleHealth,
       productivityUnit: metric === "points" ? "pts" : "m",
       hasPlanned: plannedWorkfronts.length > 0,
       matchedPoints: completedRows.length,
@@ -2796,6 +2815,43 @@
     if (!start || !Number.isFinite(days)) return "";
     const date = new Date(start.getFullYear(), start.getMonth(), start.getDate());
     date.setDate(date.getDate() + Math.max(0, Math.round(days)));
+    return isoDate(date);
+  }
+
+  function isWorkingDay(date) {
+    // DSM site dashboard assumption: Monday to Saturday are working days, Sunday is excluded.
+    return date.getDay() !== 0;
+  }
+
+  function workingDaysBetween(startKey, endKey) {
+    const start = parseDate(startKey);
+    const end = parseDate(endKey);
+    if (!start || !end) return 0;
+    if (end <= start) return 0;
+
+    let count = 0;
+    const cursor = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    cursor.setDate(cursor.getDate() + 1);
+
+    while (cursor <= end) {
+      if (isWorkingDay(cursor)) count += 1;
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return count;
+  }
+
+  function addWorkingDaysKey(startKey, workingDays) {
+    const start = parseDate(startKey);
+    if (!start || !Number.isFinite(workingDays)) return "";
+    const date = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    let remaining = Math.max(0, Math.round(workingDays));
+
+    while (remaining > 0) {
+      date.setDate(date.getDate() + 1);
+      if (isWorkingDay(date)) remaining -= 1;
+    }
+
     return isoDate(date);
   }
 

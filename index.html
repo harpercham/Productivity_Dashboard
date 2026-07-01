@@ -389,16 +389,16 @@
           <div class="scurve-kpi"><span>Completed scope</span><strong id="sCurveCompletedScope">0</strong></div>
           <div class="scurve-kpi"><span>Actual progress</span><strong id="sCurveProgress">0.00%</strong></div>
           <div class="scurve-kpi"><span>Target progress (S-curve)</span><strong id="sCurveTargetProgress">0.00%</strong></div>
-          <div class="scurve-kpi"><span>Variance vs S-curve</span><strong id="sCurveVariance">0.00%</strong></div>
           <div class="scurve-kpi"><span>Forecast finish</span><strong id="sCurveForecastFinish">-</strong></div>
-          <div class="scurve-kpi"><span>Required daily productivity</span><strong id="sCurveRequiredDaily">-</strong></div>
+          <div class="scurve-kpi"><span>Required productivity</span><strong id="sCurveRequiredDaily">-</strong></div>
           <div class="scurve-kpi"><span>Recent productivity</span><strong id="sCurveHistoricalDaily">-</strong></div>
-          <div class="scurve-kpi"><span>Matched completed points</span><strong id="sCurveMatchedPoints">0 / 0</strong></div>
+          <div class="scurve-kpi"><span>Productivity index</span><strong id="sCurveProductivityIndex">-</strong></div>
+          <div class="scurve-kpi"><span>Schedule health</span><strong id="sCurveScheduleHealth">-</strong></div>
         </div>
 
         <div class="chart-wrap extra-tall"><canvas id="progressSCurveChart"></canvas></div>
         <p id="sCurveNote" class="scurve-note">Load the dashboard to calculate progress.</p>
-        <p class="scurve-note muted">Baseline rule: add <strong>Planned Finish Date</strong> in the Workfront Allocation sheet. Start date is auto-detected from the first actual point in each workfront. Use the dashboard selector to switch between <strong>Standard S-Curve</strong> and <strong>Historical Productivity</strong>. Forecast finish uses the last 7 actual working days productivity.</p>
+        <p class="scurve-note muted">Baseline rule: add <strong>Planned Finish Date</strong> in the Workfront Allocation sheet. Start date is auto-detected from the first actual point in each workfront. Use the dashboard selector to switch between <strong>Standard S-Curve</strong> and <strong>Historical Productivity</strong>. Forecast finish uses the last 7 productive working days. Required productivity uses remaining working days to the planned finish date.</p>
       </article>
     </section>
 
