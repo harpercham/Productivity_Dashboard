@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DSM Productivity Dashboard</title>
+  <link rel="stylesheet" href="styles-v12.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">Megaspine DSM</p>
+      <h1>Productivity Dashboard</h1>
+      <p class="subtitle">Linked to GH, TH, TKG and ET Daily Point Update sheets <span class="version-badge">v12.5 · Separate plan tab</span></p>
+    </div>
+    <div class="top-actions">
+      <button id="saveConfigBtn" class="btn secondary">💾 Save settings</button>
+      <button id="loadBtn" class="btn primary">↻ Load dashboard</button>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <span class="step">1</span>
+          <div>
+            <h2>Subcontractor data links</h2>
+            <p>Use a Google Sheet URL or upload an exported CSV. Large sheets are fetched in pages so all rows are checked.</p>
+          </div>
+        </div>
+        <span id="connectionStatus" class="status neutral">Waiting for data</span>
+      </div>
+
+      <div class="source-grid">
+        <article class="source-card" data-source="GH">
+          <div class="source-title"><label><input type="checkbox" class="source-enabled" checked /> GH</label><button class="icon-btn open-sheet" title="Open Google Sheet">↗</button></div>
+          <input class="sheet-url" type="url" placeholder="Paste GH Google Sheet URL" />
+          <label class="file-label">CSV fallback<input class="csv-file" type="file" accept=".csv,text/csv" /></label>
+          <small class="source-result">Not loaded</small>
+        </article>
+        <article class="source-card" data-source="TH">
+          <div class="source-title"><label><input type="checkbox" class="source-enabled" checked /> TH</label><button class="icon-btn open-sheet" title="Open Google Sheet">↗</button></div>
+          <input class="sheet-url" type="url" placeholder="Paste TH Google Sheet URL" />
+          <label class="file-label">CSV fallback<input class="csv-file" type="file" accept=".csv,text/csv" /></label>
+          <small class="source-result">Not loaded</small>
+        </article>
+        <article class="source-card" data-source="TKG">
+          <div class="source-title"><label><input type="checkbox" class="source-enabled" checked /> TKG</label><button class="icon-btn open-sheet" title="Open Google Sheet">↗</button></div>
+          <input class="sheet-url" type="url" placeholder="Paste TKG Google Sheet URL" />
+          <label class="file-label">CSV fallback<input class="csv-file" type="file" accept=".csv,text/csv" /></label>
+          <small class="source-result">Not loaded</small>
+        </article>
+        <article class="source-card" data-source="ET">
+          <div class="source-title"><label><input type="checkbox" class="source-enabled" checked /> ET</label><button class="icon-btn open-sheet" title="Open Google Sheet">↗</button></div>
+          <input class="sheet-url" type="url" placeholder="Paste ET Google Sheet URL" />
+          <label class="file-label">CSV fallback<input class="csv-file" type="file" accept=".csv,text/csv" /></label>
+          <small class="source-result">Not loaded</small>
+        </article>
+      </div>
+
+      <div class="inline-settings">
+        <label>Source tab<input id="sheetTab" type="text" value="Daily Point Update" /></label>
+        <label>Read range<input id="sheetRange" type="text" value="A3:AE" /></label>
+      </div>
+
+      <div class="logic-link-card">
+        <div class="logic-link-heading">
+          <div>
+            <strong>Rig Model Logic link</strong>
+            <small>Link the master Rig Model Logic tab so model names update automatically.</small>
+          </div>
+          <button id="openModelLogicBtn" class="icon-btn" type="button" title="Open Rig Model Logic sheet">↗</button>
+        </div>
+        <div class="logic-link-grid">
+          <label>Google Sheet URL
+            <input id="rigModelLogicUrl" type="url" placeholder="Paste master Google Sheet URL" />
+          </label>
+          <label>Tab
+            <input id="rigModelLogicTab" type="text" value="Rig Model Logic" />
+          </label>
+          <label>Range
+            <input id="rigModelLogicRange" type="text" value="A1:B100" />
+          </label>
+          <label class="logic-file-label">CSV fallback
+            <input id="rigModelLogicFile" type="file" accept=".csv,text/csv" />
+          </label>
+        </div>
+        <small id="rigModelLogicStatus" class="logic-status neutral">Using saved/default rig models until a link or CSV is loaded.</small>
+      </div>
+
+      <div class="logic-link-card workfront-link-card">
+        <div class="logic-link-heading">
+          <div>
+            <strong>Workfront Allocation link</strong>
+            <small>Loads point design levels, ST, type and workfront. Planned Finish Date can come from a separate tab.</small>
+          </div>
+          <button id="openWorkfrontAllocationBtn" class="icon-btn" type="button" title="Open Workfront Allocation sheet">↗</button>
+        </div>
+        <div class="logic-link-grid workfront-link-grid">
+          <label>Google Sheet URL
+            <input id="workfrontAllocationUrl" type="url" value="https://docs.google.com/spreadsheets/d/1HXF_8COU2k98KItxZ0iHvwcThxzoHmT6_tHm0VpG0Tk/edit?usp=sharing" />
+          </label>
+          <label>Tab
+            <input id="workfrontAllocationTab" type="text" value="Sheet8" />
+          </label>
+          <label>Range
+            <input id="workfrontAllocationRange" type="text" value="A1:M" />
+          </label>
+          <label>Plan tab URL / same sheet URL
+            <input id="workfrontPlanUrl" type="url" value="https://docs.google.com/spreadsheets/d/1HXF_8COU2k98KItxZ0iHvwcThxzoHmT6_tHm0VpG0Tk/edit?gid=288013505#gid=288013505" />
+          </label>
+          <label>Plan tab name
+            <input id="workfrontPlanTab" type="text" placeholder="Leave blank if using gid URL" />
+          </label>
+          <label>Plan range
+            <input id="workfrontPlanRange" type="text" value="A1:Z" />
+          </label>
+          <label class="logic-file-label">Allocation CSV fallback
+            <input id="workfrontAllocationFile" type="file" accept=".csv,text/csv" />
+          </label>
+          <label class="logic-file-label">Plan CSV fallback
+            <input id="workfrontPlanFile" type="file" accept=".csv,text/csv" />
+          </label>
+        </div>
+        <small id="workfrontAllocationStatus" class="logic-status neutral">Waiting for Workfront Allocation data.</small>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div><span class="step">2</span><div><h2>Dashboard filters</h2><p>All charts and tables update together.</p></div></div>
+        <div class="button-row"><button id="resetFiltersBtn" class="btn secondary">Reset filters</button><button id="exportBtn" class="btn secondary">⬇ Export filtered CSV</button></div>
+      </div>
+      <div class="filter-grid">
+        <label>From date<input id="dateFrom" type="date" /></label>
+        <label>To date<input id="dateTo" type="date" /></label>
+        <label>Subcontractor<select id="subconFilter"><option value="">All</option></select></label>
+        <label>Rig<select id="rigFilter"><option value="">All</option></select></label>
+        <label>Rig model<select id="modelFilter"><option value="">All</option></select></label>
+        <label>ST<select id="stFilter"><option value="">All</option></select></label>
+        <label>DSM type<select id="typeFilter"><option value="">All</option></select></label>
+      </div>
+    </section>
+
+    <section class="panel model-panel">
+      <details>
+        <summary>
+          <span>Rig model names</span>
+          <small>Used in rig charts, trend legends and productivity tables</small>
+        </summary>
+        <div class="model-toolbar">
+          <p>Edit any model name below. Changes are saved in this browser.</p>
+          <button id="resetModelsBtn" class="btn secondary" type="button">Reset known models</button>
+        </div>
+        <div id="rigModelGrid" class="rig-model-grid">
+          <div class="empty-card">Load subcontractor data to list the rigs.</div>
+        </div>
+      </details>
+    </section>
+
+    <section class="kpi-grid">
+      <article class="kpi"><span>Completed points</span><strong id="kpiPoints">0</strong></article>
+      <article class="kpi"><span>Active rigs</span><strong id="kpiRigs">0</strong></article>
+      <article class="kpi"><span>Active STs</span><strong id="kpiSts">0</strong></article>
+      <article class="kpi"><span>Working days</span><strong id="kpiDays">0</strong></article>
+      <article class="kpi"><span>LG net</span><strong id="kpiLg">0.00 m³</strong></article>
+      <article class="kpi"><span>MG net</span><strong id="kpiMg">0.00 m³</strong></article>
+      <article class="kpi"><span>Average points/day</span><strong id="kpiPtsDay">0.00</strong></article>
+      <article class="kpi"><span>Average MG net/day</span><strong id="kpiMgDay">0.00 m³</strong></article>
+      <article class="kpi"><span>Average net/day</span><strong id="kpiNetDay">0.00 m³</strong></article>
+    </section>
+
+    <section class="chart-grid">
+      <article class="panel chart-card">
+        <div class="chart-heading"><div><h2>Productivity by rig</h2><p>Compare individual rigs across the selected period.</p></div><select id="rigMetric"><option value="pointsPerDay">Points/day</option><option value="points">Completed points</option><option value="netPerDay">Net m³/day</option><option value="lgNet">LG net m³</option><option value="mgNet">MG net m³</option></select></div>
+        <div class="chart-wrap"><canvas id="rigChart"></canvas></div>
+      </article>
+      <article class="panel chart-card">
+        <div class="chart-heading"><div><h2>Productivity by rig model</h2><p>Combine rigs with the same model and compare their output.</p></div><select id="modelMetric"><option value="pointsPerDay">Points/day</option><option value="points">Completed points</option><option value="netPerDay">Net m³/day</option><option value="lgNet">LG net m³</option><option value="mgNet">MG net m³</option></select></div>
+        <div class="chart-wrap"><canvas id="modelChart"></canvas></div>
+      </article>
+      <article class="panel chart-card">
+        <div class="chart-heading"><div><h2>Productivity by ST</h2><p>Compare workfront output and volume.</p></div><select id="stMetric"><option value="points">Completed points</option><option value="pointsPerDay">Points/day</option><option value="netPerDay">Net m³/day</option><option value="lgNet">LG net m³</option><option value="mgNet">MG net m³</option></select></div>
+        <div class="chart-wrap"><canvas id="stChart"></canvas></div>
+      </article>
+      <article class="panel chart-card">
+        <div class="chart-heading"><div><h2>Productivity by subcontractor</h2><p>Compare GH, TH, TKG and ET across the selected period.</p></div><select id="subconMetric"><option value="pointsPerDay">Points/day</option><option value="points">Completed points</option><option value="netPerDay">Net m³/day</option><option value="lgNet">LG net m³</option><option value="mgNet">MG net m³</option></select></div>
+        <div class="chart-wrap"><canvas id="subconChart"></canvas></div>
+      </article>
+      <article class="panel chart-card wide">
+        <div class="chart-heading trend-heading">
+          <div>
+            <h2>Rig productivity trend by working day</h2>
+            <p>Compare selected rigs from Working Day 1 onward. Each rig uses its own active-day sequence.</p>
+          </div>
+          <label class="chart-filter">Metric
+            <select id="trendMetric">
+              <option value="points">Completed points/day</option>
+              <option value="lgNet">LG net m³/day</option>
+              <option value="mgNet">MG net m³/day</option>
+              <option value="totalNet">Total net m³/day</option>
+            </select>
+          </label>
+        </div>
+        <div class="trend-rig-toolbar">
+          <div>
+            <strong>Rigs to compare</strong>
+            <span>Select one or more rigs. Legend shows rig model.</span>
+          </div>
+          <div class="button-row">
+            <button id="selectAllTrendRigsBtn" class="btn secondary compact" type="button">Select all</button>
+            <button id="clearTrendRigsBtn" class="btn secondary compact" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="trendRigOptions" class="trend-rig-options">
+          <span class="muted-note">Load data to select rigs.</span>
+        </div>
+        <div class="chart-wrap extra-tall"><canvas id="trendChart"></canvas></div>
+      </article>
+
+      <article class="panel chart-card wide">
+        <div class="chart-heading trend-heading">
+          <div>
+            <h2>Rig productivity trend by actual date</h2>
+            <p>Compare selected rigs on the same calendar timeline. Non-working dates appear as gaps.</p>
+          </div>
+          <label class="chart-filter">Metric
+            <select id="actualDateMetric">
+              <option value="points">Completed points/day</option>
+              <option value="lgNet">LG net m³/day</option>
+              <option value="mgNet">MG net m³/day</option>
+              <option value="totalNet">Total net m³/day</option>
+            </select>
+          </label>
+        </div>
+        <div class="trend-rig-toolbar actual-date-note">
+          <div>
+            <strong>Rigs to compare</strong>
+            <span>Select rigs specifically for this actual-date chart.</span>
+          </div>
+          <div class="button-row">
+            <button id="copyWorkingDayRigsBtn" class="btn secondary compact" type="button">Use working-day selection</button>
+            <button id="selectAllActualDateRigsBtn" class="btn secondary compact" type="button">Select all</button>
+            <button id="clearActualDateRigsBtn" class="btn secondary compact" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="actualDateRigOptions" class="trend-rig-options">
+          <span class="muted-note">Load data to select rigs.</span>
+        </div>
+        <div class="chart-wrap extra-tall"><canvas id="actualDateRigChart"></canvas></div>
+      </article>
+
+      <article class="panel chart-card wide">
+        <div class="chart-heading trend-heading">
+          <div>
+            <h2>Rig model productivity trend by working day</h2>
+            <p>Compare model groups from Working Day 1 onward. Rigs sharing the same model are combined.</p>
+          </div>
+          <label class="chart-filter">Metric
+            <select id="modelTrendMetric">
+              <option value="points">Completed points/day</option>
+              <option value="lgNet">LG net m³/day</option>
+              <option value="mgNet">MG net m³/day</option>
+              <option value="totalNet">Total net m³/day</option>
+            </select>
+          </label>
+        </div>
+        <div class="trend-rig-toolbar">
+          <div>
+            <strong>Rig models to compare</strong>
+            <span>Models are loaded from the linked Rig Model Logic sheet.</span>
+          </div>
+          <div class="button-row">
+            <button id="selectAllTrendModelsBtn" class="btn secondary compact" type="button">Select all</button>
+            <button id="clearTrendModelsBtn" class="btn secondary compact" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="trendModelOptions" class="trend-rig-options">
+          <span class="muted-note">Load model logic and subcontractor data to select models.</span>
+        </div>
+        <div class="chart-wrap extra-tall"><canvas id="modelTrendChart"></canvas></div>
+      </article>
+
+      <article class="panel chart-card wide">
+        <div class="chart-heading trend-heading">
+          <div>
+            <h2>Subcontractor productivity trend by working day</h2>
+            <p>Compare GH, TH, TKG and ET from Working Day 1 onward using each subcontractor’s own active-day sequence.</p>
+          </div>
+          <label class="chart-filter">Metric
+            <select id="subconTrendMetric">
+              <option value="points">Completed points/day</option>
+              <option value="lgNet">LG net m³/day</option>
+              <option value="mgNet">MG net m³/day</option>
+              <option value="totalNet">Total net m³/day</option>
+            </select>
+          </label>
+        </div>
+        <div class="trend-rig-toolbar">
+          <div>
+            <strong>Subcontractors to compare</strong>
+            <span>Select one or more subcontractors.</span>
+          </div>
+          <div class="button-row">
+            <button id="selectAllTrendSubconsBtn" class="btn secondary compact" type="button">Select all</button>
+            <button id="clearTrendSubconsBtn" class="btn secondary compact" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="trendSubconOptions" class="trend-rig-options">
+          <span class="muted-note">Load data to select subcontractors.</span>
+        </div>
+        <div class="chart-wrap extra-tall"><canvas id="subconTrendChart"></canvas></div>
+      </article>
+
+      <article class="panel chart-card wide">
+        <div class="chart-heading trend-heading">
+          <div>
+            <h2>Subcontractor productivity per active rig</h2>
+            <p>Normalises each subcontractor’s daily output by the number of rigs that worked on that day.</p>
+          </div>
+          <label class="chart-filter">Metric
+            <select id="subconPerRigMetric">
+              <option value="points">Completed points/rig/day</option>
+              <option value="lgNet">LG net m³/rig/day</option>
+              <option value="mgNet">MG net m³/rig/day</option>
+              <option value="totalNet">Total net m³/rig/day</option>
+            </select>
+          </label>
+        </div>
+        <div class="trend-rig-toolbar">
+          <div>
+            <strong>Subcontractors to compare</strong>
+            <span>Select one or more subcontractors. Working Day 1 follows each subcontractor’s own active-day sequence.</span>
+          </div>
+          <div class="button-row">
+            <button id="copySubconTrendSelectionBtn" class="btn secondary compact" type="button">Use subcon trend selection</button>
+            <button id="selectAllSubconPerRigBtn" class="btn secondary compact" type="button">Select all</button>
+            <button id="clearSubconPerRigBtn" class="btn secondary compact" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="subconPerRigOptions" class="trend-rig-options">
+          <span class="muted-note">Load data to select subcontractors.</span>
+        </div>
+        <div class="chart-wrap extra-tall"><canvas id="subconPerRigChart"></canvas></div>
+      </article>
+
+      <article class="panel chart-card wide progress-scurve-card">
+        <div class="chart-heading trend-heading">
+          <div>
+            <h2>Workfront progress S-curve</h2>
+            <p>Cumulative actual completion against the total allocated scope. Optional planned dates are shown automatically when present.</p>
+          </div>
+          <div class="chart-filter-group">
+            <label class="chart-filter">Progress basis
+              <select id="sCurveMetric">
+                <option value="points">Allocated points</option>
+                <option value="totalLength">Total design treatment length</option>
+                <option value="lgLength">LG design treatment length</option>
+                <option value="mgLength">MG design treatment length</option>
+              </select>
+            </label>
+            <label class="chart-filter">Target curve method
+              <select id="sCurveMethod">
+                <option value="standard">Standard S-Curve</option>
+                <option value="historical">Historical Productivity</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="scurve-filter-grid">
+          <label>Workfront
+            <select id="sCurveWorkfront"><option value="">All workfronts</option></select>
+          </label>
+          <label>ST
+            <select id="sCurveSt"><option value="">All STs</option></select>
+          </label>
+          <label>Type
+            <select id="sCurveType"><option value="">All types</option></select>
+          </label>
+          <div class="scurve-filter-action">
+            <button id="resetSCurveFiltersBtn" class="btn secondary compact" type="button">Reset S-curve filters</button>
+          </div>
+        </div>
+
+        <div class="scurve-kpi-grid">
+          <div class="scurve-kpi"><span>Total allocated scope</span><strong id="sCurveTotalScope">0</strong></div>
+          <div class="scurve-kpi"><span>Completed scope</span><strong id="sCurveCompletedScope">0</strong></div>
+          <div class="scurve-kpi"><span>Actual progress</span><strong id="sCurveProgress">0.00%</strong></div>
+          <div class="scurve-kpi"><span>Target progress (S-curve)</span><strong id="sCurveTargetProgress">0.00%</strong></div>
+          <div class="scurve-kpi"><span>Variance vs S-curve</span><strong id="sCurveVariance">-</strong></div>
+          <div class="scurve-kpi"><span>Forecast finish</span><strong id="sCurveForecastFinish">-</strong></div>
+          <div class="scurve-kpi"><span>Required productivity</span><strong id="sCurveRequiredDaily">-</strong></div>
+          <div class="scurve-kpi"><span>Recent productivity</span><strong id="sCurveHistoricalDaily">-</strong></div>
+          <div class="scurve-kpi"><span>Production ratio</span><strong id="sCurveProductivityIndex">-</strong></div>
+          <div class="scurve-kpi recovery-card recovery-planner-card">
+            <span>Recovery recommendation</span>
+            <strong id="sCurveScheduleHealth">-</strong>
+            <div class="recovery-grid">
+              <div>
+                <span>Current forecast</span>
+                <strong id="sCurveRecoveryCurrentForecast">-</strong>
+              </div>
+              <div>
+                <span>+1 Existing rig</span>
+                <strong id="sCurveRecoveryExistingForecast">-</strong>
+              </div>
+              <div>
+                <span>+1 New rig</span>
+                <strong id="sCurveRecoveryNewForecast">-</strong>
+              </div>
+              <div>
+                <span id="sCurveDecisionLabel">Decision by</span>
+                <strong id="sCurveDecisionDate">-</strong>
+              </div>
+            </div>
+            <div class="recovery-action-note" id="sCurveRecoveryActionNote">-</div>
+          </div>
+        <span id="sCurveMatchedPoints" hidden>-</span>
+        </div>
+
+        <div class="chart-wrap extra-tall"><canvas id="progressSCurveChart"></canvas></div>
+        <p id="sCurveNote" class="scurve-note">Load the dashboard to calculate progress.</p>
+        <p class="scurve-note muted">Baseline rule: add <strong>Planned Finish Date</strong> in the Workfront Allocation sheet. Start date is auto-detected from the first actual point in each workfront. Use the dashboard selector to switch between <strong>Standard S-Curve</strong> and <strong>Historical Productivity</strong>. Forecast finish uses the last 7 productive working days. Required productivity uses remaining working days to the planned finish date. Recovery planner shows current forecast, +1 existing rig forecast after 7 working days, +1 new rig forecast after 14 working days, and the latest decision date. +1 rig assumes productivity doubles from the recent average. Rig increase is only recommended when forecast delay exceeds 14 working days.</p>
+      </article>
+    </section>
+
+    <section class="table-grid">
+      <article class="panel">
+        <div class="table-heading"><div><h2>Rig productivity</h2><p>Ranked by points per active day.</p></div><span id="rigTableCount" class="pill">0 rigs</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Rig</th><th>Model</th><th>Subcon</th><th>Points</th><th>Days</th><th>Pts/day</th><th>LG net</th><th>MG net</th><th>MG net/day</th><th>Net/day</th></tr></thead><tbody id="rigTableBody"><tr><td colspan="10" class="empty">Load data to begin.</td></tr></tbody></table></div>
+      </article>
+      <article class="panel">
+        <div class="table-heading"><div><h2>ST productivity</h2><p>Ranked by total completed points.</p></div><span id="stTableCount" class="pill">0 STs</span></div>
+        <div class="table-scroll"><table><thead><tr><th>ST</th><th>Points</th><th>Days</th><th>Pts/day</th><th>LG net</th><th>MG net</th><th>Net/day</th></tr></thead><tbody id="stTableBody"><tr><td colspan="7" class="empty">Load data to begin.</td></tr></tbody></table></div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app-v12.js"></script>
+</body>
+</html>
