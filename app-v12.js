@@ -3011,6 +3011,13 @@
     if (dateFrom) firstDate = dateFrom;
     if (dateTo) lastDate = dateTo;
 
+    // Chart requirement: always show the full planned S-curve through the target finish date.
+    // Date To may limit actual/completed records, but it must not truncate the orange target curve.
+    const latestPlannedDate = plannedDateKeys.slice().sort().at(-1) || "";
+    if (latestPlannedDate && (!lastDate || latestPlannedDate > lastDate)) {
+      lastDate = latestPlannedDate;
+    }
+
     if (!firstDate || !lastDate) {
       const today = isoDate(new Date());
       firstDate = firstDate || today;
@@ -3057,19 +3064,16 @@
     }
 
     // KPI reporting date / As-of date:
-    // Use the latest actual production date within the selected range, not the chart end date.
-    // This keeps Target Progress KPI aligned to the orange S-curve value at the actual reporting day.
-    // Example: if the chart extends to Nov for planned baseline but latest actual is 03 Jul,
-    // Target Progress is read from 03 Jul, not from Nov.
-    const sortedActualKeys = actualDateKeys.slice().sort();
+    // IMPORTANT: Target Progress KPI has NO separate formula.
+    // It reflects the same plotted orange S-curve point used by the chart tooltip.
+    // Source of truth:
+    //   targetProgressPercent = plannedPercent[asOfIndex]
+    //   targetCompletedScope  = plannedCompletedValues[asOfIndex]
+    // The orange line is plotted through the Workfront Logic Finish date; the KPI reads
+    // the last plotted orange point on or before today. If today is outside the plotted
+    // range, clamp to the nearest plotted point.
     const todayKey = isoDate(new Date());
-    // KPI reporting date must be based on the latest actual production date that has occurred,
-    // not the chart end date and not the auto-filled Date To.  Some dashboards auto-fill
-    // Date To to the last planned/baseline date; using that made the KPI jump to 100%
-    // while the plotted S-curve at the actual reporting date was still lower.
-    let asOfKey = sortedActualKeys.filter((key) => key <= todayKey).at(-1)
-      || sortedActualKeys.at(-1)
-      || todayKey;
+    let asOfKey = todayKey;
     if (dateKeys.length) {
       if (asOfKey < dateKeys[0]) asOfKey = dateKeys[0];
       if (asOfKey > dateKeys.at(-1)) asOfKey = dateKeys.at(-1);
@@ -3078,14 +3082,11 @@
       key <= asOfKey ? index : best,
       -1
     );
-    // KPI target MUST be calculated from the same orange S-curve plotted point.
-    // Do not use any independent target calculation here.
-    // Formula requested: target progress = orange-line completed scope at As-of date / total allocated scope.
+    const targetProgressPercent = asOfIndex >= 0 && plannedWorkfronts.length
+      ? Number(plannedPercent[asOfIndex] ?? 0)
+      : 0;
     const orangeCompletedAtAsOf = asOfIndex >= 0
       ? Number(plannedCompletedValues[asOfIndex] || 0)
-      : 0;
-    const targetProgressPercent = totalScope && plannedWorkfronts.length
-      ? round((orangeCompletedAtAsOf / totalScope) * 100)
       : 0;
     const progressPercent = totalScope
       ? round((completedScope / totalScope) * 100)
