@@ -1,6 +1,7 @@
-DSM Productivity Dashboard v14.35
+# DSM Productivity Dashboard Static v14.36
 
-- Keeps the existing S-curve graph pattern unchanged.
-- Plots the full orange target S-curve until the Workfront Logic Finish date.
-- Target Progress KPI and Variance KPI read directly from the plotted orange S-curve value at the KPI as-of date.
-- No separate Target Progress calculation is used.
+Fixes the Workfront progress S-curve x-axis to always extend to the Target Finish Date from Workfront Logic.
+
+- Keeps existing graph pattern.
+- Orange S-curve is not truncated by Today / Date To / latest actual date.
+- Target KPI still reflects the orange line value.

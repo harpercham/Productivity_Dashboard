@@ -2893,7 +2893,7 @@
 
     const plannedCount = allocation.filter((row) => row.plannedDateKey).length;
     els.sCurveNote.textContent = plannedCount
-      ? `${plannedCount.toLocaleString()} allocated points include a Start/Finish target date. Target method: ${result.plannedLabel}. KPI target is read at ${prettyFullDate(result.asOfKey)}.`
+      ? `${plannedCount.toLocaleString()} allocated points include a Start/Finish target date. Target method: ${result.plannedLabel}. KPI target is read at ${prettyFullDate(result.asOfKey)}; chart extends to ${result.plannedFinishKey ? prettyFullDate(result.plannedFinishKey) : "target finish"}.`
       : "Actual cumulative progress is shown. Add a Workfront Logic tab with Area / Workfront + Start + Finish to display a planned baseline.";
   }
 
@@ -2998,7 +2998,9 @@
 
     let firstDate = [
       ...actualDateKeys,
-      ...plannedDateKeys
+      ...plannedDateKeys,
+      ...weightedRows.map((row) => row.plannedStartDateKey).filter(Boolean),
+      ...plannedWorkfronts.map((item) => item.startDateKey).filter(Boolean)
     ].sort()[0] || "";
 
     let lastDate = [
@@ -3013,7 +3015,14 @@
 
     // Chart requirement: always show the full planned S-curve through the target finish date.
     // Date To may limit actual/completed records, but it must not truncate the orange target curve.
-    const latestPlannedDate = plannedDateKeys.slice().sort().at(-1) || "";
+    // Always extend the chart to the target finish date from Workfront Logic.
+    // Do this from the filtered allocation rows directly, not only from the generated
+    // planned groups, so Date To / today / actual data cannot truncate the orange S-curve.
+    const latestPlannedDate = [
+      ...plannedDateKeys,
+      ...weightedRows.map((row) => row.plannedDateKey).filter(Boolean),
+      ...plannedWorkfronts.map((item) => item.finishDateKey).filter(Boolean)
+    ].sort().at(-1) || "";
     if (latestPlannedDate && (!lastDate || latestPlannedDate > lastDate)) {
       lastDate = latestPlannedDate;
     }
