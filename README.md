@@ -1,8 +1,6 @@
-# DSM Productivity Dashboard Static v14.23 - Match Key Column Lookup
+DSM Productivity Dashboard v14.35
 
-Changes:
-- Dashboard uses helper `Match Key` column directly when present in both allocation ST tabs and Daily Point Update.
-- Match Key format: `ST|Point No`, e.g. `ST101|J-R10-56` or `101|J-R10-56`.
-- Matching is still dictionary/set based with exact `Set.has()` lookup.
-- If Match Key is missing, dashboard falls back to exact `ST + Point No` key generation.
-- No VLOOKUP/MATCH/includes/partial point matching for completion scope.
+- Keeps the existing S-curve graph pattern unchanged.
+- Plots the full orange target S-curve until the Workfront Logic Finish date.
+- Target Progress KPI and Variance KPI read directly from the plotted orange S-curve value at the KPI as-of date.
+- No separate Target Progress calculation is used.
