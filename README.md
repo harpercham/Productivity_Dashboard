@@ -1,7 +1,7 @@
-# DSM Productivity Dashboard Static v14.36
+# DSM Productivity Dashboard v14.38
 
-Fixes the Workfront progress S-curve x-axis to always extend to the Target Finish Date from Workfront Logic.
-
-- Keeps existing graph pattern.
-- Orange S-curve is not truncated by Today / Date To / latest actual date.
-- Target KPI still reflects the orange line value.
+Update:
+- Recovery recommendation now prioritises S-curve status.
+- If Actual Progress >= Target Progress, dashboard shows On Track / Ahead and does not recommend adding rigs.
+- Forecast dates remain visible for reference.
+- Existing 6-day working calendar remains Mon-Sat.

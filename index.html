@@ -15,7 +15,7 @@
     <div>
       <p class="eyebrow">Megaspine DSM</p>
       <h1>Productivity Dashboard</h1>
-      <p class="subtitle">Linked to GH, TH, TKG and ET Daily Point Update sheets <span class="version-badge">v14.35 · S-curve source of truth</span></p>
+      <p class="subtitle">Linked to GH, TH, TKG and ET Daily Point Update sheets <span class="version-badge">v14.37 · 6-day working calendar</span></p>
     </div>
     <div class="top-actions">
       <button id="saveConfigBtn" class="btn secondary">💾 Save settings</button>
@@ -462,7 +462,7 @@
           </div>
         </div>
         <p id="sCurveNote" class="scurve-note">Load the dashboard to calculate progress.</p>
-        <p class="scurve-note muted">Baseline rule: Workfront Logic provides <strong>Start</strong> and <strong>Finish</strong>. Actual completion is matched from Daily Point Update by <strong>ST + Point No</strong>. The target S-curve uses the Start date from Workfront Logic; if Start is blank, it falls back to first actual point date. Use the dashboard selector to switch between <strong>Standard S-Curve</strong> and <strong>Historical Productivity</strong>. Forecast finish uses the last 7 productive working days. Required productivity uses remaining working days to the planned finish date. Recovery planner shows current forecast, +1 existing rig forecast after 7 working days, +1 new rig forecast after 14 working days, and the latest decision date. +1 rig assumes productivity doubles from the recent average. Rig increase is only recommended when forecast delay exceeds 14 working days.</p>
+        <p class="scurve-note muted">Baseline rule: Workfront Logic provides <strong>Start</strong> and <strong>Finish</strong>. Actual completion is matched from Daily Point Update by <strong>ST + Point No</strong>. The target S-curve uses the Start date from Workfront Logic; if Start is blank, it falls back to first actual point date. Use the dashboard selector to switch between <strong>Standard S-Curve</strong> and <strong>Historical Productivity</strong>. Forecast finish uses the last 7 productive working days. Required productivity uses a 6-day working calendar (Mon–Sat, Sunday excluded) to the planned finish date. Recovery planner shows current forecast, +1 existing rig forecast after 7 working days, +1 new rig forecast after 14 working days, and the latest decision date. +1 rig assumes productivity doubles from the recent average. Rig increase is only recommended when forecast delay exceeds 14 working days.</p>
       </article>
     </section>
 

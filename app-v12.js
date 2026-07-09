@@ -3266,10 +3266,23 @@
       newRigForecastKey: newRigForecast
     };
 
-    if (currentForecast && currentForecast <= plannedFinishKey) {
+    // Primary rule requested by project team:
+    // If actual progress is on or ahead of the target S-curve, do not recommend adding rigs.
+    // Forecast is still displayed for awareness, but recovery action is held unless the S-curve is behind.
+    if (variancePercent >= 0) {
       return {
         ...common,
         label: variancePercent >= 3 ? "🟢 Ahead" : "🟢 On Track",
+        decisionLabel: "Action",
+        decisionText: "No action needed",
+        actionNote: "Actual progress is on/ahead of the target S-curve; no rig increase recommended"
+      };
+    }
+
+    if (currentForecast && currentForecast <= plannedFinishKey) {
+      return {
+        ...common,
+        label: "🟢 On Track",
         decisionLabel: "Action",
         decisionText: "No action needed",
         actionNote: "+1 rig not required based on current forecast"
